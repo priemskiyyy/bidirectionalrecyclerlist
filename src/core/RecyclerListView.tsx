@@ -463,13 +463,22 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
             const onStartReachedCalled = this._onStartReachedCalled;
             const isRefreshScrollOffset = newProps.dataProvider.getIsRefreshScrollOffset();
             if (newProps.dataProvider.getSize() > this.props.dataProvider.getSize() || isRefreshScrollOffset) {
-
                 if (isRefreshScrollOffset) {
-                    this.scrollToEnd();
-                    setTimeout(() => {
-                        this._setOnEdgeReachedCalled(false);
-                        newProps.dataProvider.setRefreshScrollOffset(false);
-                    }, 10);
+                    const virtualLayout = this._virtualRenderer.getLayoutDimension();
+                    const viewabilityTracker = this._virtualRenderer.getViewabilityTracker();
+                    if (viewabilityTracker) {
+                        const windowBound = this.props.isHorizontal ? virtualLayout.width - this._layout.width : virtualLayout.height - this._layout.height;
+                        const lastOffset = viewabilityTracker.getLastOffset();
+                        const isWithinEndThreshold = windowBound - lastOffset <= Default.value<number>(this.props.onEndReachedThreshold, 0);
+                        const isWithinStartThreshold = lastOffset <= Default.value<number>(this.props.onStartReachedThreshold, 0);
+                        this._setOnEdgeReachedCalled(true);
+                        this.scrollToOffset(0, isWithinEndThreshold ? windowBound : 10, true);
+                        setTimeout(() => {
+                            this._setOnEdgeReachedCalled(false);
+                            newProps.dataProvider.setRefreshScrollOffset(false);
+                        }, 500);
+
+                    }
                 } else {
                     this._setOnEdgeReachedCalled(false);
                     newProps.dataProvider.setRefreshScrollOffset(false);
