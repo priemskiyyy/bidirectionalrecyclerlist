@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import BaseScrollComponent, { ScrollComponentProps } from "../../../core/scrollcomponent/BaseScrollComponent";
 import TSCast from "../../../utils/TSCast";
-import debounce = require("lodash.debounce");
+import debounce from "lodash.debounce";
 
 /***
  * The responsibility of a scroll component is to report its size, scroll events and provide a way to scroll to a given offset.

@@ -12,6 +12,7 @@
     "removeComments": false,
     "jsx": "react",
     "sourceMap": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
   }
 }
