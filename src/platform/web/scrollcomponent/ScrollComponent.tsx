@@ -3,7 +3,7 @@ import { Dimension } from "../../../core/dependencies/LayoutProvider";
 import BaseScrollComponent, { ScrollComponentProps } from "../../../core/scrollcomponent/BaseScrollComponent";
 import BaseScrollView, { ScrollEvent } from "../../../core/scrollcomponent/BaseScrollView";
 import ScrollViewer from "./ScrollViewer";
-import debounce = require("lodash.debounce");
+import debounce from "lodash.debounce";
 
 /***
  * The responsibility of a scroll component is to report its size, scroll events and provide a way to scroll to a given offset.
