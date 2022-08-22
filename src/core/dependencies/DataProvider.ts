@@ -9,6 +9,7 @@ export abstract class BaseDataProvider {
 
     // In JS context make sure stable id is a string
     public getStableId: (index: number) => string;
+    public _refreshScrollOffset: boolean = false;
     private _firstIndexToProcess: number = 0;
     private _lastIndexToProcess: number = 0;
     private _size: number = 0;
@@ -16,8 +17,9 @@ export abstract class BaseDataProvider {
     private _hasStableIds = false;
     private _requiresDataChangeHandling = false;
 
-    constructor(rowHasChanged: (r1: any, r2: any) => boolean, getStableId?: (index: number) => string) {
+    constructor(rowHasChanged: (r1: any, r2: any) => boolean, getStableId?: (index: number) => string, isRefreshScrollOffset?: boolean) {
         this.rowHasChanged = rowHasChanged;
+        this._refreshScrollOffset = !!isRefreshScrollOffset;
         if (getStableId) {
             this.getStableId = getStableId;
             this._hasStableIds = true;
@@ -26,7 +28,7 @@ export abstract class BaseDataProvider {
         }
     }
 
-    public abstract newInstance(rowHasChanged: (r1: any, r2: any) => boolean, getStableId?: (index: number) => string): BaseDataProvider;
+    public abstract newInstance(rowHasChanged: (r1: any, r2: any) => boolean, getStableId?: (index: number) => string, isRefreshScrollOffset?: boolean): BaseDataProvider;
 
     public getDataForIndex(index: number): any {
         return this._data[index];
@@ -40,6 +42,9 @@ export abstract class BaseDataProvider {
         return this._size;
     }
 
+    public getIsRefreshScrollOffset(): boolean {
+        return this._refreshScrollOffset;
+    }
     public hasStableIds(): boolean {
         return this._hasStableIds;
     }
@@ -56,10 +61,14 @@ export abstract class BaseDataProvider {
         return this._lastIndexToProcess;
     }
 
+    public setRefreshScrollOffset(refreshScrollOffset: boolean) {
+        this._refreshScrollOffset = refreshScrollOffset;
+    }
+
     //No need to override this one`
     //If you already know the first row where rowHasChanged will be false pass it upfront to avoid loop
     public cloneWithRows(newData: any[], firstModifiedIndex: number = 0, lastModifiedIndex?: number): DataProvider {
-        const dp = this.newInstance(this.rowHasChanged, this.getStableId);
+        const dp = this.newInstance(this.rowHasChanged, this.getStableId,this._refreshScrollOffset);
         const newSize = newData.length;
         const iterCount = Math.min(this._size, newSize);
         if (!ObjectUtil.isNullOrUndefined(firstModifiedIndex) && !ObjectUtil.isNullOrUndefined(lastModifiedIndex)) {
@@ -111,7 +120,7 @@ export abstract class BaseDataProvider {
 }
 
 export default class DataProvider extends BaseDataProvider {
-    public newInstance(rowHasChanged: (r1: any, r2: any) => boolean, getStableId?: ((index: number) => string) | undefined): BaseDataProvider {
-        return new DataProvider(rowHasChanged, getStableId);
+    public newInstance(rowHasChanged: (r1: any, r2: any) => boolean, getStableId?: ((index: number) => string) | undefined, isRefreshScrollOffset?: boolean): BaseDataProvider {
+        return new DataProvider(rowHasChanged, getStableId, !!isRefreshScrollOffset);
     }
 }

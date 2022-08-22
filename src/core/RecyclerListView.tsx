@@ -442,6 +442,7 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
     }
 
     private _checkAndChangeLayouts(newProps: RecyclerListViewProps, forceFullRender?: boolean): void {
+
         this._params.isHorizontal = newProps.isHorizontal;
         this._params.itemCount = newProps.dataProvider.getSize();
         this._virtualRenderer.setParamsAndDimensions(this._params, this._layout);
@@ -460,8 +461,9 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
             this._refreshViewability();
         } else if (this.props.dataProvider !== newProps.dataProvider) {
             const onStartReachedCalled = this._onStartReachedCalled;
-            if (newProps.dataProvider.getSize() > this.props.dataProvider.getSize()) {
+            if (newProps.dataProvider.getSize() > this.props.dataProvider.getSize() || newProps.dataProvider._refreshScrollOffset) {
                 this._setOnEdgeReachedCalled(false);
+                newProps.dataProvider.setRefreshScrollOffset(false);
             }
             const layoutManager = this._virtualRenderer.getLayoutManager();
             if (layoutManager) {
@@ -639,23 +641,23 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
             }
             return (
                 <ViewRenderer key={key} data={data}
-                    dataHasChanged={this._dataHasChanged}
-                    x={itemRect.x}
-                    y={itemRect.y}
-                    layoutType={type}
-                    index={dataIndex}
-                    styleOverrides={styleOverrides}
-                    layoutProvider={this.props.layoutProvider}
-                    forceNonDeterministicRendering={this.props.forceNonDeterministicRendering}
-                    isHorizontal={this.props.isHorizontal}
-                    onSizeChanged={this._onViewContainerSizeChange}
-                    childRenderer={this.props.rowRenderer}
-                    height={itemRect.height}
-                    width={itemRect.width}
-                    itemAnimator={Default.value<ItemAnimator>(this.props.itemAnimator, this._defaultItemAnimator)}
-                    extendedState={this.props.extendedState}
-                    internalSnapshot={this.state.internalSnapshot}
-                    onItemLayout={this.props.onItemLayout}/>
+                              dataHasChanged={this._dataHasChanged}
+                              x={itemRect.x}
+                              y={itemRect.y}
+                              layoutType={type}
+                              index={dataIndex}
+                              styleOverrides={styleOverrides}
+                              layoutProvider={this.props.layoutProvider}
+                              forceNonDeterministicRendering={this.props.forceNonDeterministicRendering}
+                              isHorizontal={this.props.isHorizontal}
+                              onSizeChanged={this._onViewContainerSizeChange}
+                              childRenderer={this.props.rowRenderer}
+                              height={itemRect.height}
+                              width={itemRect.width}
+                              itemAnimator={Default.value<ItemAnimator>(this.props.itemAnimator, this._defaultItemAnimator)}
+                              extendedState={this.props.extendedState}
+                              internalSnapshot={this.state.internalSnapshot}
+                              onItemLayout={this.props.onItemLayout}/>
             );
         }
         return null;
