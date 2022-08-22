@@ -461,9 +461,19 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
             this._refreshViewability();
         } else if (this.props.dataProvider !== newProps.dataProvider) {
             const onStartReachedCalled = this._onStartReachedCalled;
-            if (newProps.dataProvider.getSize() > this.props.dataProvider.getSize() || newProps.dataProvider._refreshScrollOffset) {
-                this._setOnEdgeReachedCalled(false);
-                newProps.dataProvider.setRefreshScrollOffset(false);
+            const isRefreshScrollOffset = newProps.dataProvider.getIsRefreshScrollOffset();
+            if (newProps.dataProvider.getSize() > this.props.dataProvider.getSize() || isRefreshScrollOffset) {
+
+                if (isRefreshScrollOffset) {
+                    this.scrollToEnd();
+                    setTimeout(() => {
+                        this._setOnEdgeReachedCalled(false);
+                        newProps.dataProvider.setRefreshScrollOffset(false);
+                    }, 10);
+                } else {
+                    this._setOnEdgeReachedCalled(false);
+                    newProps.dataProvider.setRefreshScrollOffset(false);
+                }
             }
             const layoutManager = this._virtualRenderer.getLayoutManager();
             if (layoutManager) {
