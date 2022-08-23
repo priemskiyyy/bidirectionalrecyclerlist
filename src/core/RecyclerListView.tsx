@@ -113,6 +113,7 @@ export interface RecyclerListViewProps {
     scrollViewProps?: object;
     applyWindowCorrection?: (offsetX: number, offsetY: number, windowCorrection: WindowCorrection) => void;
     onItemLayout?: (index: number) => void;
+    footerApproxHeight?:number
 }
 
 export interface RecyclerListViewState {
@@ -130,6 +131,7 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
         onEndReachedThreshold: 0,
         onStartReachedThreshold: 0,
         renderAheadOffset: IS_WEB ? 1000 : 250,
+        footerApproxHeight:50
     };
 
     public static propTypes = {};
@@ -472,7 +474,7 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
                         const isWithinEndThreshold = windowBound - lastOffset <= Default.value<number>(this.props.onEndReachedThreshold, 0);
                         const isWithinStartThreshold = lastOffset <= Default.value<number>(this.props.onStartReachedThreshold, 0);
                         this._setOnEdgeReachedCalled(true);
-                        this.scrollToOffset(0, isWithinEndThreshold ? windowBound : 10, true);
+                        this.scrollToOffset(0, isWithinEndThreshold ? windowBound : (this.props.footerApproxHeight ?? 50), true);
                         setTimeout(() => {
                             this._setOnEdgeReachedCalled(false);
                             newProps.dataProvider.setRefreshScrollOffset(false);
@@ -483,6 +485,7 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
                     this._setOnEdgeReachedCalled(false);
                     newProps.dataProvider.setRefreshScrollOffset(false);
                 }
+
             }
             const layoutManager = this._virtualRenderer.getLayoutManager();
             if (layoutManager) {
