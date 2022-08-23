@@ -750,6 +750,8 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
                 } else if (this.props.onStartReached && isWithinStartThreshold) {
                     this._onStartReachedCalled = true;
                     this.props.onStartReached();
+                } else {
+                    this._setOnEdgeReachedCalled(false)
                 }
             }
         }
