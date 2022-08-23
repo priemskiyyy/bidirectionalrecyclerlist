@@ -472,12 +472,15 @@ export default class RecyclerListView<P extends RecyclerListViewProps, S extends
                     const virtualLayout = this._virtualRenderer.getLayoutDimension();
                     const viewabilityTracker = this._virtualRenderer.getViewabilityTracker();
                     if (viewabilityTracker) {
+
                         const windowBound = this.props.isHorizontal ? virtualLayout.width - this._layout.width : virtualLayout.height - this._layout.height;
                         const lastOffset = viewabilityTracker.getLastOffset();
                         const isWithinEndThreshold = windowBound - lastOffset <= Default.value<number>(this.props.onEndReachedThreshold, 0);
                         const isWithinStartThreshold = lastOffset <= Default.value<number>(this.props.onStartReachedThreshold, 0);
                         this._setOnEdgeReachedCalled(true);
-                        this.scrollToOffset(0, isWithinEndThreshold ? windowBound - ((this.props.headerApproxHeight ?? 50) * 0.5): (this.props.footerApproxHeight ?? 50), true);
+                        if((onStartReachedCalled && lastOffset < 100) || (!onStartReachedCalled && lastOffset > windowBound)) {
+                            this.scrollToOffset(0, !onStartReachedCalled ? windowBound - ((this.props.headerApproxHeight ?? 50) * 0.5) : (this.props.footerApproxHeight ?? 50), true);
+                        }
                         setTimeout(() => {
                             this._setOnEdgeReachedCalled(false);
                             newProps.dataProvider.setRefreshScrollOffset(false);
